@@ -1,15 +1,15 @@
-package com.nat.network_stream.http;
+package com.nat.stream.http;
 
-import com.nat.network_stream.HLConstant;
+import com.nat.stream.Constant;
 
 import java.util.Map;
 
 /**
  * Created by xuqinchao on 17/1/20.
- *  Copyright (c) 2017 Nat. All rights reserved.
+ *  Copyright (c) 2017 Instapp. All rights reserved.
  */
 
-public class HLRequest {
+public class Request {
 
     /**
      * The request parameter
@@ -32,7 +32,7 @@ public class HLRequest {
     /**
      * The request time out
      */
-    public int timeoutMs = HLConstant.DEFAULT_TIMEOUT_MS;
+    public int timeoutMs = Constant.DEFAULT_TIMEOUT_MS;
 
     /**
      * The default timeout

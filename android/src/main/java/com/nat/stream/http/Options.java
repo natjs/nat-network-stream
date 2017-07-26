@@ -1,12 +1,12 @@
-package com.nat.network_stream.http;
+package com.nat.stream.http;
 
-import com.nat.network_stream.HLConstant;
+import com.nat.stream.Constant;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by xuqinchao on 17/1/20.
- *  Copyright (c) 2017 Nat. All rights reserved.
+ *  Copyright (c) 2017 Instapp. All rights reserved.
  */
 
 public class Options {
@@ -15,7 +15,7 @@ public class Options {
     private Map<String, String> headers;
     private String body;
     private Type type = Type.text;
-    private int timeout = HLConstant.DEFAULT_TIMEOUT_MS;
+    private int timeout = Constant.DEFAULT_TIMEOUT_MS;
 
     private Options(String method,
                     String url,
@@ -29,7 +29,7 @@ public class Options {
         this.body = body;
         this.type = type;
         if (timeout == 0) {
-            timeout = HLConstant.DEFAULT_TIMEOUT_MS;
+            timeout = Constant.DEFAULT_TIMEOUT_MS;
         }
         this.timeout = timeout;
     }

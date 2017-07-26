@@ -1,4 +1,4 @@
-package com.nat.network_stream.http;
+package com.nat.stream.http;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,11 +19,11 @@ import java.util.concurrent.Executors;
 
 /**
  * Created by xuqinchao on 17/1/20.
- *  Copyright (c) 2017 Nat. All rights reserved.
+ *  Copyright (c) 2017 Instapp. All rights reserved.
  */
 
-public class DefaultHLHttpAdapter implements IHLHttpAdapter {
-    public static final String TAG = "DefaultHLHttpAdapter";
+public class DefaultHttpAdapter implements HttpAdapter {
+    public static final String TAG = "DefaultHttpAdapter";
     private ExecutorService mExecutorService;
 
     private void execute(Runnable runnable){
@@ -34,14 +34,14 @@ public class DefaultHLHttpAdapter implements IHLHttpAdapter {
     }
 
     @Override
-    public void sendRequest(final HLRequest request, final IHLHttpAdapter.OnHttpListener listener) {
+    public void sendRequest(final Request request, final HttpAdapter.OnHttpListener listener) {
         if (listener != null) {
             listener.onHttpStart();
         }
         execute(new Runnable() {
             @Override
             public void run() {
-                HLResponse response = new HLResponse();
+                Response response = new Response();
                 try {
                     HttpURLConnection connection = openConnection(request, listener);
                     Map<String,List<String>> headers = connection.getHeaderFields();
@@ -87,7 +87,7 @@ public class DefaultHLHttpAdapter implements IHLHttpAdapter {
      * @return an open connection
      * @throws IOException
      */
-    private HttpURLConnection openConnection(HLRequest request, IHLHttpAdapter.OnHttpListener listener) throws IOException {
+    private HttpURLConnection openConnection(Request request, HttpAdapter.OnHttpListener listener) throws IOException {
         URL url = new URL(request.url);
         HttpURLConnection connection = createConnection(url);
         connection.setConnectTimeout(request.timeoutMs);
@@ -126,7 +126,7 @@ public class DefaultHLHttpAdapter implements IHLHttpAdapter {
         return connection;
     }
 
-    private byte[] readInputStreamAsBytes(InputStream inputStream, IHLHttpAdapter.OnHttpListener listener) throws IOException{
+    private byte[] readInputStreamAsBytes(InputStream inputStream, HttpAdapter.OnHttpListener listener) throws IOException{
         if(inputStream == null){
             return null;
         }
@@ -149,7 +149,7 @@ public class DefaultHLHttpAdapter implements IHLHttpAdapter {
         return buffer.toByteArray();
     }
 
-    private String readInputStream(InputStream inputStream, IHLHttpAdapter.OnHttpListener listener) throws IOException {
+    private String readInputStream(InputStream inputStream, HttpAdapter.OnHttpListener listener) throws IOException {
         if(inputStream == null){
             return null;
         }

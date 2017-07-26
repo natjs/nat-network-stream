@@ -1,16 +1,19 @@
-package com.nat.network_stream;
+package com.nat.stream;
 
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import com.nat.network_stream.http.DefaultHLHttpAdapter;
-import com.nat.network_stream.http.HLRequest;
-import com.nat.network_stream.http.HLResponse;
-import com.nat.network_stream.http.IHLHttpAdapter;
-import com.nat.network_stream.http.Options;
+
+import com.nat.stream.http.DefaultHttpAdapter;
+import com.nat.stream.http.Request;
+import com.nat.stream.http.Response;
+import com.nat.stream.http.HttpAdapter;
+import com.nat.stream.http.Options;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,23 +21,23 @@ import java.util.Map;
 
 /**
  * Created by xuqinchao on 17/1/23.
- *  Copyright (c) 2017 Nat. All rights reserved.
+ *  Copyright (c) 2017 Instapp. All rights reserved.
  */
 
-public class HLStreamModule{
+public class StreamModule {
 
     private Context mContext;
-    private static volatile HLStreamModule instance = null;
+    private static volatile StreamModule instance = null;
 
-    private HLStreamModule(Context context){
+    private StreamModule(Context context){
         mContext = context;
     }
 
-    public static HLStreamModule getInstance(Context context) {
+    public static StreamModule getInstance(Context context) {
         if (instance == null) {
-            synchronized (HLStreamModule.class) {
+            synchronized (StreamModule.class) {
                 if (instance == null) {
-                    instance = new HLStreamModule(context);
+                    instance = new StreamModule(context);
                 }
             }
         }
@@ -42,20 +45,20 @@ public class HLStreamModule{
         return instance;
     }
     
-    public void fetch(String optionsStr, final HLModuleResultListener HLModuleResultListener){
-        if (HLModuleResultListener == null)return;
+    public void fetch(String optionsStr, final ModuleResultListener ModuleResultListener){
+        if (ModuleResultListener == null)return;
         JSONObject optionsObj = null;
         try {
             optionsObj = JSON.parseObject(optionsStr);
         }catch (JSONException e){
             Log.e("", e.getMessage());
-            HLModuleResultListener.onResult(HLUtil.getError(HLConstant.FETCH_INVALID_ARGUMENT, 1));
+            ModuleResultListener.onResult(Util.getError(Constant.FETCH_INVALID_ARGUMENT, 1));
         }
 
         boolean invaildOption = optionsObj==null || optionsObj.getString("url")==null;
         if(invaildOption){
-            if(HLModuleResultListener != null) {
-                HLModuleResultListener.onResult(HLUtil.getError(HLConstant.FETCH_INVALID_ARGUMENT, 1));
+            if(ModuleResultListener != null) {
+                ModuleResultListener.onResult(Util.getError(Constant.FETCH_INVALID_ARGUMENT, 1));
             }
             return;
         }
@@ -83,10 +86,10 @@ public class HLStreamModule{
         final Options options = builder.createOptions();
         sendRequest(options, new ResponseCallback() {
             @Override
-            public void onResponse(HLResponse response, Map<String, String> headers) {
-                if (HLModuleResultListener != null) {
+            public void onResponse(Response response, Map<String, String> headers) {
+                if (ModuleResultListener != null) {
                     if (response.errorCode < 0) {
-                        HLModuleResultListener.onResult(HLUtil.getError(HLConstant.FETCH_NETWORK_ERROR, HLConstant.FETCH_NETWORK_ERROR_CODE));
+                        ModuleResultListener.onResult(Util.getError(Constant.FETCH_NETWORK_ERROR, Constant.FETCH_NETWORK_ERROR_CODE));
                         return;
                     }
                     String ori_data = new String(response.originalData);
@@ -102,14 +105,14 @@ public class HLStreamModule{
                         result.put("ok", false);
                         if (!TextUtils.isEmpty(ori_data)) result.put("data", ori_data);
                         Log.d("network fetch false", result.toString());
-                        HLModuleResultListener.onResult(result);
+                        ModuleResultListener.onResult(result);
                         return;
                     }
 
                     result.put("ok", true);
                     if (!TextUtils.isEmpty(ori_data)) result.put("data", ori_data);
                     Log.d("network fetch true", result.toString());
-                    HLModuleResultListener.onResult(result);
+                    ModuleResultListener.onResult(result);
                 }
             }
         });
@@ -137,34 +140,34 @@ public class HLStreamModule{
     }
 
     private void sendRequest(Options options, ResponseCallback callback){
-        HLRequest hlRequest = new HLRequest();
-        hlRequest.method = options.getMethod();
-//        hlRequest.url = mWXSDKInstance.rewriteUri(Uri.parse(options.getUrl()), URIAdapter.REQUEST).toString();
-        hlRequest.url = options.getUrl();
-        hlRequest.body = options.getBody();
-        hlRequest.timeoutMs = options.getTimeout();
+        Request request = new Request();
+        request.method = options.getMethod();
+//        request.url = mWXSDKInstance.rewriteUri(Uri.parse(options.getUrl()), URIAdapter.REQUEST).toString();
+        request.url = options.getUrl();
+        request.body = options.getBody();
+        request.timeoutMs = options.getTimeout();
 
         if(options.getHeaders()!=null)
-            if (hlRequest.paramMap == null) {
-                hlRequest.paramMap = options.getHeaders();
+            if (request.paramMap == null) {
+                request.paramMap = options.getHeaders();
             }else{
-                hlRequest.paramMap.putAll(options.getHeaders());
+                request.paramMap.putAll(options.getHeaders());
             }
 
 
-        IHLHttpAdapter adapter = new DefaultHLHttpAdapter();
+        HttpAdapter adapter = new DefaultHttpAdapter();
         if (adapter != null) {
-            adapter.sendRequest(hlRequest, new StreamHttpListener(callback));
+            adapter.sendRequest(request, new StreamHttpListener(callback));
         }else{
             Log.e("WXStreamModule","No HttpAdapter found,request failed.");
         }
     }
 
     private interface ResponseCallback{
-        void onResponse(HLResponse response, Map<String, String> headers);
+        void onResponse(Response response, Map<String, String> headers);
     }
 
-    private static class StreamHttpListener implements IHLHttpAdapter.OnHttpListener {
+    private static class StreamHttpListener implements HttpAdapter.OnHttpListener {
         private ResponseCallback mCallback;
         private Map<String,Object> mResponse = new HashMap<>();
         private Map<String,String> mRespHeaders;
@@ -207,7 +210,7 @@ public class HLStreamModule{
         }
 
         @Override
-        public void onHttpFinish(final HLResponse response) {
+        public void onHttpFinish(final Response response) {
             //compatible with old sendhttp
             if(mCallback!=null){
                 mCallback.onResponse(response, mRespHeaders);

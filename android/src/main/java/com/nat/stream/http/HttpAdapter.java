@@ -1,14 +1,14 @@
-package com.nat.network_stream.http;
+package com.nat.stream.http;
 
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by xuqinchao on 17/1/20.
- *  Copyright (c) 2017 Nat. All rights reserved.
+ *  Copyright (c) 2017 Instapp. All rights reserved.
  */
 
-public interface IHLHttpAdapter {
+public interface HttpAdapter {
 
     /**
      * http request method
@@ -16,7 +16,7 @@ public interface IHLHttpAdapter {
      * @param request weex assemble request
      * @param listener http response notify
      */
-    void sendRequest(HLRequest request, OnHttpListener listener);
+    void sendRequest(Request request, OnHttpListener listener);
 
     interface OnHttpListener {
 
@@ -46,6 +46,6 @@ public interface IHLHttpAdapter {
          * http response finish
          * @param response
          */
-        void onHttpFinish(HLResponse response);
+        void onHttpFinish(Response response);
     }
 }
